@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ecoline LLC</title>
+  <style>
+    /* Basic styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #fafafa;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      
+    }
+    header img {
+      height: 150px;
+    }
+    .container {
+      max-width: 960px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .box {
+      margin-bottom: 20px;
+    }
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    label {
+      flex: 1 1 180px;
+      display: flex;
+      flex-direction: column;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="datetime-local"],
+    input[type="number"] {
+      padding: 6px 8px;
+      font-size: 1rem;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    table thead tr {
+      background: #0077cc;
+      color: white;
+      text-align: left;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 10px;
+      min-width: 40px;
+    }
+    td[contenteditable] {
+      background: #fffbea;
+      cursor: text;
+    }
+    .amount, .total {
+      background: #f9f9f9;
+      font-weight: 600;
+      text-align: right;
+    }
+    .add-btn {
+      margin-top: 10px;
+      padding: 8px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #28a745;
+      border: none;
+      color: white;
+      border-radius: 3px;
+    }
+    .delete-btn {
+      background: #dc3545;
+      border: none;
+      color: white;
+      padding: 4px 8px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .totals p {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin: 6px 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      align-items: center;
+    }
+    .totals input {
+      width: 120px;
+      font-weight: 700;
+      text-align: right;
+      background: #e9ecef;
+      border: 1px solid #ccc;
+    }
+    .btn-section {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .btn-section button {
+      padding: 10px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 3px;
+      border: none;
+      background: #007bff;
+      color: white;
+      flex: 1 1 180px;
+      min-width: 140px;
+      transition: background 0.3s;
+    }
+    .btn-section button:hover {
+      background: #0056b3;
+    }
+    .signature-box {
+      margin-top: 30px;
+      text-align: center;
+      font-weight: bold;
+      color: #444;
+    }
+    .signature-box img {
+      max-height: 80px;
+      margin-bottom: 5px;
+    }
+
+    /* Hidden Tata-style Invoice Template for print */
+#invoicePrint {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: auto;
+  background: white;
+  z-index: 9999;
+  
+  display: none;
+  height: 297mm;
+  overflow: hidden;
+}
+
+
+
+    #invoicePrint h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    #invoicePrint table.customer {
+      width: 100%;
+      margin-bottom: 20px;
+      border-collapse: collapse;
+      font-size: 1rem;
+    }
+    #invoicePrint table.customer td {
+      vertical-align: top;
+      padding: 4px;
+    }
+    #invoicePrint table.items {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 1rem;
+    }
+    #invoicePrint table.items th,
+    #invoicePrint table.items td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: left;
+    }
+    #invoicePrint table.items th {
+      background-color: #eee;
+    }
+    #invoicePrint table.totals {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      font-size: 1rem;
+    }
+    #invoicePrint table.totals td {
+      padding: 4px;
+    }
+    #invoicePrint .totals .label {
+      text-align: right;
+      font-weight: bold;
+      padding-right: 10px;
+    }
+
+    /* Print styles: show only the invoice print section */
+   @media print {
+      body * {
+        visibility: hidden;
+      }
+      #invoicePrint, #invoicePrint * {
+        visibility: visible;
+      }
+      #invoicePrint {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        max-height: 100%;
+        padding: 10mm 12mm;
+        margin: 0;
+        box-sizing: border-box;
+        background: white;
+        transform: scale(0.82);
+        transform-origin: top center;
+        font-size: 0.85rem;
+        overflow: hidden;
+        page-break-after: avoid;
+      }
+      table, tr, td, th {
+        page-break-inside: avoid !important;
+      }
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+
+
+  </style>
+</head>
+
+<body>
+<header>
+   <div style="
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #000;
+    max-width: 100%;
+    margin: 0 auto;
+    text-align: left;
+  ">
+    <!-- Logo Left -->
+    <div style="flex: 0 0 auto;">
+      <img src="ecoline_logo-removebg-preview.png" width="100" style="display: block;" alt="Ecoline Logo" />
+    </div>
+
+    <!-- Company Info Right -->
+    <div>
+      <h2 style="margin: 0; font-size: 24px;">Ecoline-LLC</h2>
+      <p style="margin: 4px 0; font-weight: bold;">📍 MUWEILAH, SHARJAH</p>
+      <p style="margin: 2px 0;">
+        <a href="mailto:thameembasha@ecolinellc.com" style="text-decoration: none; color: #000;">thameembasha@ecolinellc.com</a>
+      </p>
+    </div>
+  </div>
+</header>
+
+
+
+  <div class="container">
+    <!-- Invoice Details -->
+    <div class="box flex-row">
+      <label>Profarma No:<input id="proformaNo" type="text" placeholder="INV12345" /></label>
+      <label>Date:<input id="date" type="datetime-local" /></label>
+      <label>LPM No:<input id="lpmno" type="text"  placeholder="0001" /></label>
+      <label>DO No:<input id="dono" type="text" placeholder="29ABCDE1234F2Z5" /></label>
+      <label>TRN No:<input id="trnNo" type="text" value="105015605600001" /></label>
+      <label>Customer Email:<input id="customerEmail" type="email" placeholder="example@gmail.com" /></label>
+    </div>
+
+    <!-- Customer Details -->
+    <div class="box flex-row">
+      <label>Customer Name:<input id="customerName" type="text" placeholder="Full Name" /></label>
+      <label>Address:<input id="customerAddress" type="text" placeholder="Street, City" /></label>
+           <label>Sales ID :<input id="salesid" type="text" placeholder="thameem" /></label>
+      <label>Mobile:<input id="customerMobile" type="text" placeholder="9876543210" /></label>
+    </div>
+
+    <!-- Items Table -->
+    <div class="box">
+      <table id="itemsTable">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>HSN</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Amount</th>
+            <th>VAT %</th>
+            <th>Discount %</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td contenteditable data-placeholder="Enter Product Name"></td>
+            <td contenteditable data-placeholder="Enter HSN"></td>
+            <td contenteditable data-placeholder="Enter Quantity"></td>
+            <td contenteditable data-placeholder="Enter Rate"></td>
+            <td class="amount" contenteditable="false"></td>
+            <td contenteditable data-placeholder="Enter VAT %"></td>
+            <td contenteditable data-placeholder="Enter Discount %"></td>
+            <td class="total" contenteditable="false"></td>
+            <td><button class="delete-btn" onclick="deleteRow(this)" title="Delete Row">X</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="add-btn" onclick="addRow()">+ Add Item</button>
+    </div>
+
+    <!-- Totals Section -->
+<div class="box totals">
+  <p>Sub Total: <input type="number" id="subTotal" value="0" readonly /></p>
+  <p>VAT Total: <input type="number" id="VATTotal" value="0" readonly /></p>
+  <p>Discount Total: <input type="number" id="discountTotal" value="0" readonly /></p>
+  <p>Grand Total: <input type="number" id="grandTotal" value="0" readonly /></p>
+  <p id="amountInWords" style="font-style: italic; color: #555;"></p>
+
+</div>
+
+
+
+
+    <!-- Buttons -->
+    <div class="btn-section">
+      <button onclick="printInvoice()">Print / Save PDF</button>
+      <button onclick="shareOnWhatsApp()">Share via WhatsApp</button>
+      <button onclick="openGmailCompose()">Send Invoice via Gmail</button>
+      <button onclick="saveInvoiceToLocal()">Save Invoice</button>
+      <button onclick="clearInvoice()">Clear Invoice</button>
+      <button> <a href="index.html" class="btn">Back to home</a></button>
+      <button onclick="saveAsPDF()">Download PDF</button>
+<button onclick="saveProforma()">Save to Dashboard</button>
+
+
+
+
+    </div>
+    
+<div id="historySection" style="display:none; border:1px solid #ccc; padding:20px; margin-top:30px; background:#f9f9f9; border-radius:8px;">
+  <h3 style="margin-bottom: 15px; font-size: 1.5em; color: #333;">Bill History</h3>
+  <div id="historyContent" style="max-height: 300px; overflow-y: auto;">
+    <div style="color:#666;">No history found.</div>
+  </div>
+  <div style="text-align: right; margin-top: 20px;">
+    <button onclick="closeHistory()" style="padding: 8px 16px; background: #ff5252; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+  </div>
+</div>
+
+
+<div id="content">
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <section id="invoicePrint" aria-hidden="true" style="padding: 20px; background: white;">
+  <!-- Company Header -->
+  <div style="text-align: center; margin-bottom: 20px;">
+    <div style="background: #000; color: #fff; display: inline-block; padding: 4px 12px; font-size: 12px; font-weight: bold;">PROFARMA INVOICE</div>
+    <h2 style="margin: 10px 0 5px; font-size: 28px; color: #003366;">Ecoline-LLC</h2>
+    <p style="margin: 2px 0;">📍 MUWEILAH, SHARJAH</p>
+    <p style="margin: 2px 0; color: #004080;">thameembasha@ecolinellc.com</p>
+  </div>
+
+  <!-- Contact Info -->
+  <div style="font-size: 13px; text-align: right; margin-bottom: 10px;">
+    <strong>Phone:</strong> +971 55 542 3086
+  </div>
+
+  <!-- Invoice and Customer Info -->
+  <table style="width: 100%; font-size: 13px; border-collapse: collapse; margin-bottom: 20px;">
+    <tr>
+      <td style="vertical-align: top;">
+        <strong>Bill To:</strong><br>
+        <span id="pr_customerName"></span><br>
+        <span id="pr_customerAddress"></span><br>
+        <strong>Mobile:</strong> <span id="pr_customerMobile"></span><br>
+        <strong>Email:</strong> <span id="pr_customerEmail"></span>
+      </td>
+      <td style="text-align: right; vertical-align: top;">
+        <strong>Invoice No:</strong> <span id="pr_invoiceNo"></span><br>
+        <strong>Date:</strong> <span id="pr_invoiceDate"></span><br>
+        <strong>LPM No:</strong> <span id="pr_lpmno"></span><br>
+        <strong>DO No:</strong> <span id="pr_dono"></span><br>
+        <strong>Sales ID:</strong> <span id="pr_salesid"></span><br>
+        <strong>TRN No:</strong> 105015605600001
+      </td>
+    </tr>
+  </table>
+
+  <!-- Item Table -->
+  <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px;">
+    <thead>
+      <tr style="background: #eee;">
+        <th style="border: 1px solid #333; padding: 6px; width: 15%;">Item</th>
+        <th style="border: 1px solid #333; padding: 6px; width: 10%;">HSN</th>
+        <th style="border: 1px solid #333; padding: 6px; width: 8%;">Qty</th>
+        <th style="border: 1px solid #333; padding: 6px; width: 10%;">Rate</th>
+        <th style="border: 1px solid #333; padding: 6px; width: 12%;">Amount</th>
+        <th style="border: 1px solid #333; padding: 6px; width: 8%;">VAT %</th>
+        <th style="border: 1px solid #333; padding: 6px; width: 10%;">Discount %</th>
+        <th style="border: 1px solid #333; padding: 6px; width: 15%;">Total</th>
+      </tr>
+    </thead>
+    <tbody id="pr_itemsBody">
+      <!-- Rows inserted by JS -->
+    </tbody>
+  </table>
+
+  <!-- Totals -->
+  <table style="width: 100%; font-size: 13px; margin-top: 10px;">
+    <tr>
+      <td style="text-align: right; padding: 4px 10px;"><strong>Sub Total:</strong></td>
+      <td style="text-align: right;">AED <span id="pr_subTotal"></span></td>
+    </tr>
+    <tr>
+      <td style="text-align: right; padding: 4px 10px;"><strong>VAT Total:</strong></td>
+      <td style="text-align: right;">AED <span id="pr_VATTotal"></span></td>
+    </tr>
+    <tr>
+      <td style="text-align: right; padding: 4px 10px;"><strong>Discount Total:</strong></td>
+      <td style="text-align: right;">AED <span id="pr_DiscountTotal"></span></td>
+    </tr>
+    <tr>
+      <td style="text-align: right; padding: 4px 10px;"><strong>Grand Total:</strong></td>
+      <td style="text-align: right; font-weight: bold;">AED <span id="pr_grandTotal"></span></td>
+    </tr>
+    <tr>
+      <td style="text-align: right; padding: 4px 10px;"><strong>Amount in Words:</strong></td>
+      <td style="text-align: right; font-style: italic;">AED <span id="pr_amountInWords"></span></td>
+    </tr>
+  </table>
+
+  <!-- Bank Details -->
+  <div style="margin-top: 30px; font-size: 12px; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
+    <strong>Bank Name:</strong> RAKBANK<br>
+    <strong>Account No:</strong> 0573559155001<br>
+    <strong>Currency:</strong> AED<br>
+    <strong>IBAN Number:</strong> AE740400000573559155001
+  </div>
+
+  <!-- Signature -->
+  <div style="margin-top: 40px; display: flex; justify-content: flex-end;">
+    <div style="text-align: center;">
+      <div style="font-weight: bold;">For Ecoline LLC</div>
+      <img src="WhatsApp Image 2025-06-07 at 18.30.47_08b41f15.jpg" alt="Signature" style="max-height: 80px; margin: 10px auto;" />
+      <div>Authorized Signatory</div>
+    </div>
+  </div>
+
+  <!-- Approvals -->
+  <div style="display: flex; justify-content: space-between; margin-top: 40px; font-size: 13px;">
+    <div style="width: 32%; text-align: center;">
+      <hr style="margin: 30px 0 10px;">
+      <strong>Entered By</strong>
+    </div>
+    <div style="width: 32%; text-align: center;">
+      <hr style="margin: 30px 0 10px;">
+      <strong>Approved By</strong>
+    </div>
+    <div style="width: 32%; text-align: center;">
+      <hr style="margin: 30px 0 10px;">
+      <strong>Authorized By</strong>
+    </div>
+  </div>
+
+  <!-- Footer Note -->
+  <p style="text-align: center; font-size: 11px; color: #666; margin-top: 20px; font-style: italic;">
+    This is a system generated document, hence signature not required.
+  </p>
+</section>
+
+    
+    <script>
+  function closeHistory() {
+    document.getElementById("historySection").style.display = "none";
+  }
+
+  function viewHistory() {
+    const historySection = document.getElementById("historySection");
+    const historyContent = document.getElementById("historyContent");
+    const billHistory = JSON.parse(localStorage.getItem("billHistory")) || [];
+
+    if (billHistory.length === 0) {
+      historyContent.innerHTML = '<div style="color:#999;">No history available.</div>';
+    } else {
+      historyContent.innerHTML = billHistory.map(bill => `
+        <div style="padding: 10px; border-bottom: 1px solid #ddd;">
+          <strong>Invoice No:</strong> ${bill.invoiceNo} <br>
+          <strong>Date:</strong> ${bill.invoiceDate} <br>
+          <strong>Customer:</strong> ${bill.customerName} <br>
+          <strong>Total:</strong> AED${bill.grandTotal}
+        </div>
+      `).join('');
+    }
+
+    historySection.style.display = "block";
+  }
+ 
+ 
+ 
+
+
+</script>
+  </section>
+</div>
+
+  <style>
+  /* Placeholder for contenteditable cells */
+  td[contenteditable]:empty:before {
+    content: attr(data-placeholder);
+    color: #aaa;
+    pointer-events: none;
+    user-select: none;
+  }
+   header img {
+      height: 50px;
+    }
+</style>
+
+<!--
+  Make sure your HTML has:
+  - A table with id="itemsTable" and a tbody inside it
+  - Input fields with ids: invoiceNo, invoiceDate, placeOfSupply, gstinSeller, panNo, customerEmail,
+    customerName, customerAddress, , gstinBuyer, customerMobile,
+    subTotal, VATTotal, DiscountTotal, grandTotal
+  - A div with id="historySection" containing a child with id="historyContent" for history display
+-->
+
+<script>
+  // Add new item row
+ function addRow() {
+  const tbody = document.querySelector('#itemsTable tbody');
+  const newRow = document.createElement('tr');
+  newRow.innerHTML = `
+    <td contenteditable data-placeholder="Enter Product Name"></td>
+    <td contenteditable data-placeholder="Enter HSN"></td>
+    <td contenteditable data-placeholder="Enter Quantity"></td>
+    <td contenteditable data-placeholder="Enter Rate"></td>
+    <td class="amount" contenteditable="false"></td>
+    <td contenteditable data-placeholder="Enter VAT %"></td>
+    <td contenteditable data-placeholder="Enter Discount %"></td>
+    <td class="total" contenteditable="false"></td>
+    <td><button class="delete-btn" onclick="deleteRow(this)" title="Delete Row">X</button></td>
+  `;
+  tbody.appendChild(newRow);
+}
+
+// Delete item row
+function deleteRow(btn) {
+  const row = btn.closest('tr');
+  row.remove();
+  calculateTotals();
+}
+
+function isValidNumber(value) {
+  return !isNaN(value) && value >= 0;
+}
+
+function calculateTotals() {
+  let subTotal = 0, VATTotal = 0, discountTotal = 0, grandTotal = 0;
+  const rows = document.querySelectorAll('#itemsTable tbody tr');
+
+  rows.forEach(row => {
+    // Get and clean cell text
+    const qty = parseFloat(row.cells[2]?.innerText.trim()) || 0;
+    const rate = parseFloat(row.cells[3]?.innerText.trim()) || 0;
+    const VATPercent = parseFloat(row.cells[5]?.innerText.trim()) || 0;
+    const discountPercent = parseFloat(row.cells[6]?.innerText.trim()) || 0;
+
+    // If any of the core values is invalid, skip this row
+    if (![qty, rate, VATPercent, discountPercent].every(isValidNumber)) {
+      row.querySelector('.amount').innerText = '';
+      row.querySelector('.total').innerText = '';
+      return;
+    }
+
+    // Calculations
+    const amount = qty * rate;
+    const VATAmount = (amount * VATPercent) / 100;
+    const discountAmount = (amount * discountPercent) / 100;
+    const total = amount + VATAmount - discountAmount;
+
+    // Update UI
+    row.querySelector('.amount').innerText = amount.toFixed(2);
+    row.querySelector('.total').innerText = total.toFixed(2);
+
+    // Update overall totals
+    subTotal += amount;
+    VATTotal += VATAmount;
+    discountTotal += discountAmount;
+    grandTotal += total;
+  });
+
+  // Totals section
+  document.getElementById('subTotal').value = subTotal.toFixed(2);
+  document.getElementById('VATTotal').value = VATTotal.toFixed(2);
+  document.getElementById('discountTotal').value = discountTotal.toFixed(2);
+  document.getElementById('grandTotal').value = grandTotal.toFixed(2);
+}
+
+// Auto-recalculate on editable input
+document.querySelector('#itemsTable tbody').addEventListener('input', (e) => {
+  if (e.target.isContentEditable) {
+    calculateTotals();
+  }
+});
+function convertNumberToWords(amount) {
+  const words = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen",
+    "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+  function convertToWords(n) {
+    if (n < 20) return words[n];
+    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? " " + words[n % 10] : "");
+    if (n < 1000) return words[Math.floor(n / 100)] + " Hundred" + (n % 100 !== 0 ? " and " + convertToWords(n % 100) : "");
+    if (n < 100000) return convertToWords(Math.floor(n / 1000)) + " Thousand" + (n % 1000 !== 0 ? " " + convertToWords(n % 1000) : "");
+    if (n < 10000000) return convertToWords(Math.floor(n / 100000)) + " Lakh" + (n % 100000 !== 0 ? " " + convertToWords(n % 100000) : "");
+    return convertToWords(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 !== 0 ? " " + convertToWords(n % 10000000) : "");
+  }
+
+  amount = parseFloat(amount).toFixed(2);
+  const [AEDStr, FilsStr] = amount.split(".");
+  const AED = parseInt(AEDStr, 10);
+  const Fils = parseInt(FilsStr, 10);
+
+  let result = "Dirhams" + convertToWords(AED);
+  if (Fils > 0) result += " and " + convertToWords(Fils) + " Fils";
+  result += " Only";
+
+  return result;
+}
+// ✅ Add this at the end of populatePrintInvoice()
+const grandTotalStr = document.getElementById('grandTotal').value;
+if (grandTotalStr && !isNaN(grandTotalStr)) {
+  const amountWords = convertNumberToWords(grandTotalStr);
+  document.getElementById('pr_amountInWords').innerText = amountWords;
+} else {
+  document.getElementById('pr_amountInWords').innerText = 'Invalid amount';
+}
+function printInvoice() {
+  populatePrintInvoice(); // ✅ call this before window.print()
+  window.print();
+}
+
+
+
+function clearInvoice() {
+  if (confirm('Clear all invoice data?')) {
+    [
+      'invoiceNo', 'invoiceDate', 'placeOfSupply', 'dono', 'trnNo',
+      'customerEmail', 'customerName', 'customerAddress', 
+      'salesid', 'customerMobile', 'subTotal', 'VATTotal', 'discountTotal', 'grandTotal'
+    ].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+
+    const tbody = document.querySelector('#itemsTable tbody');
+    tbody.innerHTML = '';
+    addRow();
+    calculateTotals();
+  }
+}
+
+function saveInvoiceToLocal() {
+  const invoiceData = {
+    invoiceNo: document.getElementById('invoiceNo').value,
+    invoiceDate: document.getElementById('invoiceDate').value,
+    customerEmail: document.getElementById('customerEmail').value,
+    customerName: document.getElementById('customerName').value,
+    customerAddress: document.getElementById('customerAddress').value,
+    salesid: document.getElementById('salesid').value,
+    customerMobile: document.getElementById('customerMobile').value,
+    items: [],
+    totals: {
+      subTotal: document.getElementById('subTotal').value,
+      VATTotal: document.getElementById('VATTotal').value,
+      discountTotal: document.getElementById('discountTotal').value,
+      grandTotal: document.getElementById('grandTotal').value,
+    }
+  };
+
+  // Save to localStorage + history
+  let history = JSON.parse(localStorage.getItem("billHistory") || "[]");
+  history.push({
+    invoiceNo: invoiceData.invoiceNo,
+    invoiceDate: invoiceData.invoiceDate,
+    customerName: invoiceData.customerName,
+    customerAddress: invoiceData.customerAddress,
+    grandTotal: invoiceData.totals.grandTotal,
+    VATTotal: invoiceData.totals.VATTotal
+  });
+  localStorage.setItem("billHistory", JSON.stringify(history));
+  localStorage.setItem("savedInvoice", JSON.stringify(invoiceData));
+
+  alert('Invoice saved and history updated.');
+}
+
+  function loadInvoiceFromLocal() {
+    const saved = localStorage.getItem('savedInvoice');
+    if (!saved) {
+      alert('No saved invoice found.');
+      return;
+    }
+
+    const invoiceData = JSON.parse(saved);
+    Object.keys(invoiceData).forEach(key => {
+      if (key !== 'items' && key !== 'totals') {
+        const el = document.getElementById(key);
+        if (el) el.value = invoiceData[key];
+      }
+    });
+
+    const tbody = document.querySelector('#itemsTable tbody');
+    tbody.innerHTML = '';
+    invoiceData.items.forEach(item => {
+      addRow();
+      const lastRow = tbody.lastElementChild;
+      lastRow.cells[0].innerText = item.item;
+      lastRow.cells[1].innerText = item.hsn;
+      lastRow.cells[2].innerText = item.qty;
+      lastRow.cells[3].innerText = item.rate;
+      lastRow.cells[4].innerText = item.amount;
+      lastRow.cells[5].innerText = item.cgst;
+      lastRow.cells[6].innerText = item.Discount;
+      lastRow.cells[7].innerText = item.total;
+    });
+
+    if (invoiceData.totals) {
+      document.getElementById('subTotal').value = invoiceData.totals.subTotal;
+      document.getElementById('cgstTotal').value = invoiceData.totals.cgstTotal;
+      document.getElementById('DiscountTotal').value = invoiceData.totals.DiscountTotal;
+      document.getElementById('grandTotal').value = invoiceData.totals.grandTotal;
+    }
+
+    calculateTotals();
+  }
+
+  function showHistory() {
+    const history = JSON.parse(localStorage.getItem("billHistory")) || [];
+    const historyContent = document.getElementById("historyContent");
+    if (!history.length) {
+      historyContent.innerHTML = "No history found.";
+    } else {
+      historyContent.innerHTML = history.map(h => `
+        <div style="border-bottom:1px dashed #ccc;margin-bottom:10px;padding:5px">
+          <strong>Invoice #${h.invoiceNo}</strong><br>
+          Date: ${h.invoiceDate}<br>
+          Customer: ${h.customerName}<br>
+          Address: ${h.customerAddress}<br>
+          Grand Total: AED${h.grandTotal}
+        </div>
+      `).join('');
+    }
+    document.getElementById("historySection").style.display = "block";
+  }
+
+  function closeHistory() {
+    document.getElementById("historySection").style.display = "none";
+  }
+
+  
+
+  // SHARE WHATSAPP: open WhatsApp with invoice summary text
+  function shareOnWhatsApp() {
+    const invoiceNo = document.getElementById('invoiceNo').value || 'N/A';
+    const invoiceDate = document.getElementById('invoiceDate').value || 'N/A';
+    const customerName = document.getElementById('customerName').value || 'Customer';
+    const grandTotal = document.getElementById('grandTotal').value || '0.00';
+
+    const message = encodeURIComponent(
+      `Invoice No: ${invoiceNo}\nDate: ${invoiceDate}\nCustomer: ${customerName}\nGrand Total: AED${grandTotal}\n\nThank you for your business!`
+    );
+
+    const whatsappUrl = `https://wa.me/?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+  }
+
+  // Initial setup - add one row and calculate totals
+  window.onload = () => {
+    if (document.querySelectorAll('#itemsTable tbody tr').length === 0) addRow();
+    calculateTotals();
+  };
+  function shareViaGmail() {
+  const email = document.getElementById('customerEmail').value.trim();
+  if (!email) {
+    alert('Please enter customer email to share invoice.');
+    return;
+  }
+
+  // Compose subject and body
+  const subject = encodeURIComponent(`Invoice #${document.getElementById('invoiceNo').value || ''}`);
+  
+  // Simple example body - you can customize or generate full invoice text here
+  let body = `Dear Customer,%0D%0A%0D%0APlease find your invoice details below:%0D%0A`;
+  body += `Invoice No: ${document.getElementById('invoiceNo').value}%0D%0A`;
+  body += `Date: ${document.getElementById('invoiceDate').value}%0D%0A`;
+  body += `Grand Total: AED${document.getElementById('grandTotal').value}%0D%0A%0D%0AThank you for your business.%0D%0A`;
+
+  // Build mailto URL
+  const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
+
+  // Open in new tab/window
+  window.open(mailtoLink, '_blank');
+}
+function generateInvoiceEmail() {
+  const customerName = document.getElementById('customerName').value || 'Customer';
+  const customerEmail = document.getElementById('customerEmail').value || '';
+  const companyName = 'Ecoline-LLC';
+  const companyPhone = ' +971 65253328';
+  const companyEmail = 'namohamedyunus417@gmail.com';
+
+  // Get first item details from the table
+  const firstRow = document.querySelector('#itemsTable tbody tr');
+  if (!firstRow) {
+    alert('No items found in the invoice!');
+    return '';
+  }
+
+  const itemName = firstRow.cells[0].innerText.trim() || 'N/A';
+  const qty = firstRow.cells[2].innerText.trim() || 'N/A';
+  const rate = firstRow.cells[3].innerText.trim() || 'N/A';
+  const total = firstRow.cells[7].innerText.trim() || 'N/A';
+
+  const message = `
+Dear ${customerName},
+
+Thank you for your purchase from ${companyName}.
+Here is your invoice detail for the item:
+
+Item Name: ${itemName}
+Quantity: ${qty}
+Rate: AED${rate}
+Total Amount: AED${total}
+
+If you have any questions or need further assistance, feel free to contact us at:
+📞 ${companyPhone}
+📧 ${companyEmail}
+
+We appreciate your business and look forward to serving you again!
+
+Best regards,
+${companyName}
+${companyPhone}
+${companyEmail}
+  `.trim();
+
+  return message;
+}
+function openGmailCompose() {
+  const customerEmail = document.getElementById('customerEmail').value || '';
+  if (!customerEmail) {
+    alert('Please enter the customer email to share the invoice.');
+    return;
+  }
+
+  const subject = encodeURIComponent('Your Invoice from Ecoline-LLC');
+  const body = encodeURIComponent(generateInvoiceEmail());
+
+  const mailtoUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(customerEmail)}&su=${subject}&body=${body}`;
+
+  window.open(mailtoUrl, '_blank');
+}
+// Populate hidden print template with all fields
+function populatePrintInvoice() {
+  // Copy all field values
+  const fields = [
+    'invoiceNo', 'invoiceDate', 'lpmno', 'dono', 'trnNo',
+    'customerEmail', 'customerName', 'customerAddress', '',
+    'JobRef', 'customerMobile'
+  ];
+
+  fields.forEach(id => {
+    const input = document.getElementById(id);
+    const output = document.getElementById('pr_' + id);
+    if (input && output) {
+      output.innerText = id === 'invoiceDate'
+        ? input.value.replace('T', ' ')
+        : input.value;
+    }
+  });
+
+  // Populate items table
+  const prBody = document.getElementById('pr_itemsBody');
+  prBody.innerHTML = '';
+  const rows = document.querySelectorAll('#itemsTable tbody tr');
+
+  rows.forEach(row => {
+    const itemName = row.cells[0].innerText.trim();
+    if (!itemName) return; // Skip empty rows
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${itemName}</td>
+      <td>${row.cells[1].innerText}</td>
+      <td>${row.cells[2].innerText}</td>
+      <td>${row.cells[3].innerText}</td>
+      <td>${row.cells[4].innerText}</td>
+      <td>${row.cells[5].innerText}</td>
+      <td>${row.cells[6].innerText}</td>
+      <td>${row.cells[7].innerText}</td>
+    `;
+    prBody.appendChild(tr);
+  });
+
+  // Populate totals
+  // Populate totals (corrected casing)
+document.getElementById('pr_subTotal').innerText = document.getElementById('subTotal').value;
+document.getElementById('pr_VATTotal').innerText = document.getElementById('VATTotal').value;
+document.getElementById('pr_DiscountTotal').innerText = document.getElementById('discountTotal').value;
+document.getElementById('pr_grandTotal').innerText = document.getElementById('grandTotal').value;
+const grandTotalStr = document.getElementById('grandTotal').value;
+if (!isNaN(grandTotalStr)) {
+  document.getElementById('pr_amountInWords').innerText = convertNumberToWords(grandTotalStr);
+}
+
+}
+function printInvoice() {
+  populatePrintInvoice();
+  window.print();
+}
+function saveInvoiceTotal(totalAmount) {
+  let data = JSON.parse(localStorage.getItem("invoiceTotals") || "[]");
+  data.push(totalAmount);
+  localStorage.setItem("invoiceTotals", JSON.stringify(data));
+}
+saveInvoiceTotal(grandTotalAmount); // replace with your actual total
+
+function savePurchaseTotal(totalAmount) {
+  let data = JSON.parse(localStorage.getItem("purchaseTotals") || "[]");
+  data.push(totalAmount);
+  localStorage.setItem("purchaseTotals", JSON.stringify(data));
+}
+
+savePurchaseTotal(grandTotalPurchase); // replace with actual total
+
+
+async function saveAsPDF() {
+  populatePrintInvoice();
+
+  // Wait for fonts and images
+  await new Promise(resolve => setTimeout(resolve, 800));
+
+  const element = document.getElementById("invoicePrint");
+
+  // Make sure it's visible
+  element.style.display = "block";
+
+  // Scroll to top to make sure canvas renders correctly
+  window.scrollTo(0, 0);
+
+  html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+    const imgData = canvas.toDataURL("image/jpeg", 1.0);
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    // Resize image to fit A4
+    const imgWidth = pageWidth;
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+
+    pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
+    pdf.save("Ecoline_Invoice.pdf");
+
+    // Hide after save if needed
+    element.style.display = "none";
+  });
+}
+
+
+
+  // Push all item rows into invoiceData.items
+  const rows = document.querySelectorAll('#itemsTable tbody tr');
+  rows.forEach(row => {
+    invoiceData.items.push({
+      item: row.cells[0].innerText.trim(),
+      hsn: row.cells[1].innerText.trim(),
+      qty: row.cells[2].innerText.trim(),
+      rate: row.cells[3].innerText.trim(),
+      amount: row.cells[4].innerText.trim(),
+      vat: row.cells[5].innerText.trim(),
+      discount: row.cells[6].innerText.trim(),
+      total: row.cells[7].innerText.trim(),
+    });
+  });
+
+  // Save to localStorage
+  localStorage.setItem('savedInvoice', JSON.stringify(invoiceData));
+
+  // Save to history
+
+function showHistory() {
+  const history = JSON.parse(localStorage.getItem("billHistory")) || [];
+  const historyContent = document.getElementById("historyContent");
+  historyContent.innerHTML = history.length ? history.map(h => `
+    <div style="border-bottom:1px dashed #ccc;margin-bottom:10px;padding:5px">
+      <strong>Invoice #${h.invoiceNo}</strong><br>
+      Date: ${h.invoiceDate}<br>
+      Customer: ${h.customerName}<br>
+      Address: ${h.customerAddress}<br>
+      Grand Total: AED${h.grandTotal}
+    </div>
+  `).join('') : "No history found.";
+  document.getElementById("historySection").style.display = "block";
+}
+
+ function saveProforma() {
+  const data = {
+    proformaNo: document.getElementById("proformaNo").value,
+    date: document.getElementById("date").value,
+    customer: document.getElementById("customerName").value,
+    total: parseFloat(document.getElementById("grandTotal").value),
+    vat: parseFloat(document.getElementById("VATTotal").value)
+  };
+
+  fetch('save_proforma.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.status === 'success' ? "Proforma saved!" : "Failed: " + data.message);
+  });
+}
+
+
+// Save Invoice totals
+
+
+</script>
+
+
+
+
+</body>
+</html>

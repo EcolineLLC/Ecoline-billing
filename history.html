@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bill History</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+    .back-button {
+      display: block;
+      margin: 10px auto 20px;
+      text-align: center;
+    }
+    .back-button button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .back-button button:hover {
+      background-color: #0056b3;
+    }
+    .bill-card {
+      background: white;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-left: 5px solid #007bff;
+    }
+    .bill-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .bill-info {
+      margin-bottom: 10px;
+    }
+    .item-list {
+      padding-left: 20px;
+      margin-bottom: 10px;
+    }
+    .total {
+      font-weight: bold;
+      color: #007bff;
+      text-align: right;
+    }
+    @media (max-width: 600px) {
+      .bill-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .total {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📜 Bill History</h2>
+    <div class="back-button">
+      <a href="index.html"><button>← Back to Billing</button></a>
+    </div>
+    <div id="historyOutput"></div>
+  </div>
+
+  <script>
+    function loadBillHistory() {
+      const historyDiv = document.getElementById("historyOutput");
+      const billHistory = JSON.parse(localStorage.getItem("billHistory")) || [];
+
+      if (billHistory.length === 0) {
+        historyDiv.innerHTML = "<p style='text-align:center;'>No past bills found.</p>";
+        return;
+      }
+
+      // Clear existing content
+      historyDiv.innerHTML = '';
+
+      // Show bills in reverse chronological order
+      billHistory.reverse().forEach((bill) => {
+        const itemsHtml = (bill.items || []).map(item =>
+          `<li>${item.itemName || 'Unknown'} - ${item.qty || 0} × AED${item.rate || 0} = AED${(parseFloat(item.qty || 0) * parseFloat(item.rate || 0)).toFixed(2)}</li>`
+        ).join("");
+
+        const cardHtml = `
+          <div class="bill-card">
+            <div class="bill-header">
+              <span><strong>Bill #${bill.invoiceNo || 'N/A'}</strong></span>
+            </div>
+            <div class="bill-info">
+              <strong>Customer:</strong> ${bill.customerName || 'N/A'}<br>
+            </div>
+            <ul class="item-list">${itemsHtml}</ul>
+            <div class="total">Total: AED${bill.grandTotal !== undefined ? bill.grandTotal : 'N/A'}</div>
+          </div>
+        `;
+
+        historyDiv.innerHTML += cardHtml;
+      });
+    }
+
+    window.onload = loadBillHistory;
+  </script>
+</body>
+</html>

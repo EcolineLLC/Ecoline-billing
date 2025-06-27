@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Outstanding Statement - Ecoline LLC</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 13px;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f6f8;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 20px;
+      margin: 10px 0;
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      padding: 10px 8px;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      background-color: #f0f0f0;
+      font-weight: 600;
+    }
+
+    input[type="text"], input[type="number"], input[type="date"] {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: #007bff;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      margin: 5px 5px 15px 0;
+    }
+
+    .btn:hover { background-color: #0056b3; }
+
+    .delete-btn {
+      background: #ff4d4d;
+      color: white;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover { background: #d93636; }
+
+    .aging-box {
+      border: 2px solid #000;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+
+    .aging-box h3 {
+      margin-top: 0;
+    }
+
+    .aging-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      font-weight: bold;
+    }
+
+    .aging-grid span {
+      background: #f7f9fa;
+      padding: 8px 12px;
+      border-radius: 6px;
+      display: block;
+    }
+
+    .signature {
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .signature div {
+      width: 45%;
+      border-top: 1px solid #000;
+      text-align: center;
+      padding-top: 5px;
+      font-style: italic;
+    }
+
+    .header-info label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    @media print {
+      .btn, .delete-btn, #searchInput {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+      }
+
+      input {
+        border: none !important;
+        background: transparent !important;
+        font-size: 12px;
+        padding: 0;
+      }
+
+      table, th, td {
+        border: 1px solid #000 !important;
+        border-collapse: collapse !important;
+      }
+
+      th {
+        background-color: #eee !important;
+        color: #000 !important;
+      }
+
+      .aging-box {
+        border: 2px solid #000;
+        padding: 10px;
+        margin-top: 20px;
+        page-break-inside: avoid;
+      }
+
+      .aging-grid span {
+        border-bottom: 1px dashed #999;
+        background: none !important;
+        padding: 6px 10px;
+        margin-bottom: 6px;
+      }
+
+      .aging-grid span:last-child {
+        border-bottom: none;
+      }
+
+      .container {
+        box-shadow: none;
+        border: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div style="width: 50%; text-align: center; margin: auto;">
+  <h1>Outstanding Statement</h1>
+  <h2 style="margin: 5px 0; font-size: 30px; font-weight: bold; line-height: 1.2;">
+    <span style="letter-spacing: 2px; color: #003366;">Ecoline-LLC</span>
+  </h2>
+  <div style="font-size: 13px;">📍 MUWEILAH, SHARJAH</div>
+  <div style="font-size: 13px; color: #004080;">thameembasha@ecolinellc.com</div>
+</div>
+
+<div class="container">
+  <div class="header-info">
+    <label>Customer Name: <input id="customer name" type="text" placeholder="Customer name" /></label>
+    <label>Customer Address: <input id="customeraddress" type="text" placeholder="Customer address" /></label>
+    <label>Date: <input id="date" type="date" /></label>
+    <label>Phone: <input id="phone" type="number" placeholder="123456789" /></label>
+  </div>
+
+  <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search LPO, Date, Amount..." style="margin: 10px 0; padding: 8px; width: 100%; border: 1px solid #ccc; border-radius: 6px;">
+
+  
+
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>LPO Number</th>
+        <th>Days</th>
+        <th>Debit</th>
+        <th>Credit</th>
+        <th>Balance</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="entryBody"></tbody>
+  </table>
+
+  <div><strong>Total Outstanding: AED <span id="totalOutstanding">0.00</span></strong></div>
+
+  <div class="aging-box">
+    <h3>Invoice Aging Summary</h3>
+    <div class="aging-grid">
+      <span>0–30 Days: AED <span id="aging30">0.00</span></span>
+      <span>31–60 Days: AED <span id="aging60">0.00</span></span>
+      <span>61–90 Days: AED <span id="aging90">0.00</span></span>
+      <span>91–120 Days: AED <span id="aging120">0.00</span></span>
+      <span>&gt;120 Days: AED <span id="agingOver120">0.00</span></span>
+    </div>
+  </div>
+
+  <div style="margin-top: 30px; font-size: 12px; background: #fff; border-radius: 8px; padding: 10px 15px; border: 1px solid #d9e6f2;">
+    <p><strong>Bank Name:</strong> RAKBANK</p>
+    <p><strong>Account No:</strong> 0573559155001</p>
+    <p><strong>Currency:</strong> AED</p>
+    <p><strong>IBAN Number:</strong> AE740400000573559155001</p>
+  </div>
+
+  <div class="signature">
+    <div>Authorized Signatory<br>For Ecoline LLC</div>
+    <div>Accepted By<br>Accounts Department</div>
+  </div>
+</div>
+<button class="btn" onclick="addRow()">+ Add New Entry</button>
+  <button class="btn" onclick="saveData()">💾 Save</button>
+  <button class="btn" onclick="window.print()">🖨️ Print</button>
+  <button class="btn" onclick="exportToExcel()">📥 Excel</button>
+  <button> <a href="index.html" class="btn">Back to home</a></button>
+ <button onclick="saveOutstanding()">Save Outstanding</button>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+  function addRow() {
+    const tbody = document.getElementById('entryBody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input type="date" onchange="updateAll()"></td>
+      <td><input type="text" placeholder="LPO Number"></td>
+      <td><input type="number" placeholder="Days" min="0" onchange="updateAll()"></td>
+      <td><input type="number" placeholder="Debit" min="0" step="0.01" oninput="updateAll()"></td>
+      <td><input type="number" placeholder="Credit" min="0" step="0.01" oninput="updateAll()"></td>
+      <td><input type="number" placeholder="Balance" readonly></td>
+      <td><button class="delete-btn" onclick="removeRow(this)">Delete</button></td>
+    `;
+    tbody.appendChild(row);
+  }
+
+  function removeRow(btn) {
+    btn.closest('tr').remove();
+    updateAll();
+  }
+
+  function updateAll() {
+    let total = 0;
+    let aging = { '30': 0, '60': 0, '90': 0, '120': 0, 'over': 0 };
+    const rows = document.querySelectorAll('#entryBody tr');
+
+    rows.forEach(row => {
+      const inputs = row.querySelectorAll('input');
+      const days = parseInt(inputs[2].value) || 0;
+      const debit = parseFloat(inputs[3].value) || 0;
+      const credit = parseFloat(inputs[4].value) || 0;
+      const balance = debit - credit;
+      inputs[5].value = balance.toFixed(2);
+      total += balance;
+
+      if (days <= 30) aging['30'] += balance;
+      else if (days <= 60) aging['60'] += balance;
+      else if (days <= 90) aging['90'] += balance;
+      else if (days <= 120) aging['120'] += balance;
+      else aging['over'] += balance;
+
+      if (balance < 0) {
+        inputs[5].style.backgroundColor = '#ffe6e6';
+        inputs[5].style.color = '#d00';
+      } else {
+        inputs[5].style.backgroundColor = '';
+        inputs[5].style.color = '';
+      }
+    });
+
+    document.getElementById('totalOutstanding').textContent = total.toFixed(2);
+    document.getElementById('aging30').textContent = aging['30'].toFixed(2);
+    document.getElementById('aging60').textContent = aging['60'].toFixed(2);
+    document.getElementById('aging90').textContent = aging['90'].toFixed(2);
+    document.getElementById('aging120').textContent = aging['120'].toFixed(2);
+    document.getElementById('agingOver120').textContent = aging['over'].toFixed(2);
+  }
+
+  function saveData() {
+    const data = {
+      customer: {
+        name: document.getElementById("customer name").value,
+        address: document.getElementById("customeraddress").value,
+        date: document.getElementById("date").value,
+        phone: document.getElementById("phone").value
+      },
+      rows: []
+    };
+    document.querySelectorAll('#entryBody tr').forEach(row => {
+      const i = row.querySelectorAll('input');
+      data.rows.push({ date: i[0].value, lpo: i[1].value, days: i[2].value, debit: i[3].value, credit: i[4].value });
+    });
+    localStorage.setItem("ecoline_data", JSON.stringify(data));
+    alert("Data saved locally!");
+  }
+
+  function loadData() {
+    const saved = localStorage.getItem("ecoline_data");
+    if (!saved) return;
+    const data = JSON.parse(saved);
+    document.getElementById("customer name").value = data.customer.name;
+    document.getElementById("customeraddress").value = data.customer.address;
+    document.getElementById("date").value = data.customer.date;
+    document.getElementById("phone").value = data.customer.phone;
+    data.rows.forEach(r => {
+      addRow();
+      const i = document.querySelectorAll('#entryBody tr:last-child input');
+      i[0].value = r.date; i[1].value = r.lpo; i[2].value = r.days;
+      i[3].value = r.debit; i[4].value = r.credit;
+    });
+    updateAll();
+  }
+
+  function exportToExcel() {
+    const data = [["Date", "LPO Number", "Days", "Debit", "Credit", "Balance"]];
+    document.querySelectorAll("#entryBody tr").forEach(row => {
+      const i = row.querySelectorAll("input");
+      data.push([i[0].value, i[1].value, i[2].value, i[3].value, i[4].value, i[5].value]);
+    });
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    XLSX.utils.book_append_sheet(wb, ws, "Outstanding");
+    XLSX.writeFile(wb, "Outstanding_Statement.xlsx");
+  }
+
+  function filterTable() {
+    const val = document.getElementById("searchInput").value.toLowerCase();
+    document.querySelectorAll("#entryBody tr").forEach(r => {
+      r.style.display = r.innerText.toLowerCase().includes(val) ? "" : "none";
+    });
+  }
+
+  function saveOutstanding() {
+  const customer = document.getElementById("customer name").value;
+  const date = document.getElementById("date").value;
+  const amount = prompt("Enter outstanding amount:");
+
+  if (!amount || isNaN(amount)) return alert("Invalid amount");
+
+  fetch('save_outstanding.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ customer, date, amount: parseFloat(amount) })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.status === 'success' ? "Outstanding saved!" : "Failed: " + data.message);
+  });
+}
+</script>
+</body>
+</html>

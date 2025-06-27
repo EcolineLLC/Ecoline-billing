@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Delivery Note with History</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 11px;
+      margin: 20px;
+    }
+    .delivery-note-container {
+      max-width: 800px;
+      margin: auto;
+      padding: 15px;
+      border: 1px solid #444;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    textarea {
+      font-size: 10px;
+      padding: 4px;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      height: 24px;
+    }
+    textarea {
+      height: auto;
+      resize: vertical;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+      margin-top: 10px;
+    }
+    table, th, td {
+      border: 1px solid #999;
+    }
+    th {
+      background: #005073;
+      color: white;
+    }
+    th, td {
+      padding: 4px;
+      text-align: center;
+    }
+    td input, td textarea {
+      padding: 4px;
+      font-size: 10px;
+      width: 100%;
+    }
+    .btn {
+      font-size: 10px;
+      padding: 6px 12px;
+      margin: 4px;
+      background-color: #005073;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .signature-box {
+      margin-top: 20px;
+      font-size: 10px;
+      border-top: 1px dashed #888;
+      padding-top: 10px;
+    }
+    .signature-box p {
+      margin: 6px 0;
+    }
+    #historyList {
+      font-size: 10px;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    .history-item {
+      margin-bottom: 8px;
+    }
+    @media print {
+      #historyList,
+      .btn,
+      .btn * {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="printArea">
+  <div class="delivery-note-container">
+
+    <div style="text-align: center;">
+      <div style="font-size: 10px; background: #000; color: #fff; padding: 1px 8px; display: inline-block;">DELIVERY NOTE</div>
+      <h2 style="margin: 4px 0; font-size: 18px;"><span style="letter-spacing: 1px; color: #003366;">Ecoline-LLC</span></h2>
+      <div style="font-size: 10px;">📍 MUWEILAH, SHARJAH</div>
+      <div style="font-size: 10px; color: #004080;">thameembasha@ecoline.com</div>
+      <div style="font-size: 10px;"><strong>Phone:</strong> +971 55 542 3086</div>
+    </div>
+
+    <div style="margin-top: 10px; display: flex; gap: 15px; font-size: 10px;">
+      <div style="width: 45%;">
+        <strong>Customer Information</strong><br><br>
+        <label>Name:</label>
+        <input type="text" id="customerName"><br>
+        <label>Address:</label>
+        <textarea id="custAddress"></textarea><br>
+        <label>Contact No:</label>
+        <input type="text" id="custContact">
+      </div>
+      <div style="width: 45%;">
+        <strong>Document Details</strong><br><br>
+        <label>Date:</label>
+        <input type="date" id="date"><br>
+        <label>Invoice No:</label>
+        <input type="text" id="invoiceNo"><br>
+        <label>LPM No:</label>
+        <input type="text" id="lpmNo"><br>
+        <label>DO No:</label>
+        <input type="text" id="deliveryNo">
+      </div>
+    </div>
+
+    <table id="itemTable">
+      <thead>
+        <tr>
+          
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>UOM</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <button class="btn" onclick="addRow()">Add Row</button>
+    <button class="btn" onclick="window.print()">Print</button>
+    <button class="btn" onclick="saveToHistory()">Save to History</button>
+    <button onclick="saveDelivery()">Save Delivery</button>
+
+    <div class="signature-box">
+      <p><strong>Received By:</strong> __________________</p>
+      <p><strong>Contact No:</strong> __________________</p>
+      <p><strong>Signature:</strong> __________________</p>
+    </div>
+
+    <div id="historyList">
+      <strong>Saved Delivery Notes:</strong>
+      <div id="historyContainer"></div>
+    </div>
+     <div class="signature-box" style="margin-top: 50px; display: flex; justify-content: flex-end; padding-right: 50px;">
+  <div style="text-align: center;">
+    <div style="font-weight: bold; margin-bottom: 10px;">For Ecoline LLC</div>
+    <img src="WhatsApp Image 2025-06-07 at 18.30.47_08b41f15.jpg" alt="Authorized Signature" style="max-height: 80px; display: block; margin: 0 auto;" />
+    <div style="margin-top: 5px;">Authorized Signatory</div>
+  </div>
+</div>
+
+
+<table style="width: 100%; margin-top: 40px; font-family: Arial, sans-serif; font-size: 13px; text-align: center; border-collapse: collapse;">
+  <tr>
+    <!-- Entered By -->
+    <td style="padding-top: 30px; border: 1px solid #ccc;">
+      <div style="height: 25px;"></div> <!-- Extra space above line -->
+      <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div>
+      <div style="margin-top: 8px; font-weight: bold;">Entered By</div>
+    </td>
+
+    <!-- Approved By -->
+    <td style="padding-top: 30px; border: 1px solid #ccc;">
+      <div style="height: 25px;"></div> <!-- Extra space above line -->
+      <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div>
+      <div style="margin-top: 8px; font-weight: bold;">Approved By</div>
+    </td>
+
+    <!-- Authorised By -->
+    <td style="padding-top: 30px; border: 1px solid #ccc;">
+      <div style="height: 25px;"></div> <!-- Extra space above line -->
+      <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div>
+      <div style="margin-top: 8px; font-weight: bold;">Authorised By</div>
+    </td>
+  </tr>
+</table>
+
+<!-- System note -->
+<p style="font-size: 11px; margin-top: 10px; text-align: center; font-style: italic; color: #555;">
+  This is a system generated document, hence signature not required.
+</p>
+
+  </div>
+</div>
+
+<script>
+  
+
+  function addRow() {
+    const table = document.getElementById("itemTable").getElementsByTagName('tbody')[0];
+    const row = table.insertRow();
+    
+    row.insertCell(0).innerHTML = '<textarea placeholder="Description"></textarea>';
+    row.insertCell(1).innerHTML = '<input type="number" placeholder="Qty">';
+    row.insertCell(2).innerHTML = '<input type="text" placeholder="UOM">';
+    row.insertCell(3).innerHTML = '<button class="btn" onclick="deleteRow(this)">Delete</button>';
+  }
+
+  function deleteRow(btn) {
+    const row = btn.closest("tr");
+    row.remove();
+    updateSerials();
+  }
+
+  function updateSerials() {
+    document.querySelectorAll("#itemTable tbody tr").forEach((row, i) => {
+      row.cells[0].innerText = 1 + 1;
+    });
+  }
+
+  function saveToHistory() {
+    const delivery = {
+      date: document.getElementById("date").value,
+      invoiceNo: document.getElementById("invoiceNo").value,
+      lpmNo: document.getElementById("lpmNo").value,
+      doNo: document.getElementById("doNo").value,
+      customer: {
+        name: document.getElementById("custName").value,
+        address: document.getElementById("custAddress").value,
+        contact: document.getElementById("custContact").value,
+      },
+      items: [...document.querySelectorAll("#itemTable tbody tr")].map(tr => ({
+        description: tr.cells[0].querySelector('textarea').value,
+        quantity: tr.cells[1].querySelector('input').value,
+        uom: tr.cells[2].querySelector('input').value
+      }))
+    };
+    const history = JSON.parse(localStorage.getItem('deliveryHistory') || '[]');
+    history.push(delivery);
+    localStorage.setItem('deliveryHistory', JSON.stringify(history));
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const history = JSON.parse(localStorage.getItem('deliveryHistory') || '[]');
+    const container = document.getElementById("historyContainer");
+    container.innerHTML = history.map((h, i) => `
+      <div class="history-item">
+        <strong>#${i + 1}</strong> - ${h.date} - ${h.invoiceNo}<br>
+        Customer: ${h.customer.name}<br>
+        Items: ${h.items.length} <br>
+      </div>`).join('');
+  }
+
+  window.onload = function () {
+    generateNumbers();
+    addRow();
+    renderHistory();
+  };
+  function saveDelivery() {
+  const data = {
+    deliveryNo: document.getElementById("deliveryNo").value,
+    date: document.getElementById("date").value,
+    customer: document.getElementById("customerName").value
+  };
+
+  fetch('save_delivery.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.status === 'success' ? "Delivery saved!" : "Failed: " + data.message);
+  });
+}
+</script>
+</body>
+</html>
